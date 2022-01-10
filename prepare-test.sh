@@ -147,8 +147,11 @@ copy_Files () {
     cp ${cdir}/X.org.files/xinit-compat.desktop /usr/share/xsessions
 }
 
-install_RHEL_8 () {
-    packages=""
+prepare_RHEL8 () {
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.CentOS8))'
+    echo "Installing the following packages:"
+    echo ${packages[@]}
+    # dnf install -y ${packages[@]} >> ${logfile} 2>&1
 }
 
 install_Fedora3x () {
@@ -204,7 +207,7 @@ get_Distribution
 if [[ "${os}" = "Linux" ]]; then
     case ${distribution} in
         "Red Hat Enterprise Linux" )
-            echo "looks good so far."
+            prepare_RHEL8
             ;;
         "Fedora" )
             if [[ "${version}" != 3* ]]; then
