@@ -148,7 +148,7 @@ copy_Files () {
 }
 
 prepare_RHEL8 () {
-    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.CentOS8))'
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
     echo "Installing the following packages:"
     echo ${packages[@]}
     # dnf install -y ${packages[@]} >> ${logfile} 2>&1
