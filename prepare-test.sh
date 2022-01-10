@@ -3,8 +3,8 @@
 # +-------------------------------------------------------------------------+
 # | prepare.sh                                                              |
 # +-------------------------------------------------------------------------+
-# | Copyright © 2019 Waldemar Schroeer                                      |
-# |                  waldemar.schroeer(at)rz-amper.de                       |
+# | Copyright © 2022 TTI, Inc.                                              |
+# |                  euis.network(at)de.ttiinc.com                          |
 # +-------------------------------------------------------------------------+
 
 # +----- Variables ---------------------------------------------------------+
@@ -147,6 +147,10 @@ copy_Files () {
     cp ${cdir}/X.org.files/xinit-compat.desktop /usr/share/xsessions
 }
 
+install_RHEL_8 () {
+    packages=""
+}
+
 install_Fedora3x () {
     echo "Installing Repository: RPM Fusion for Fedora - Free - Updates"
     dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >> ${logfile} 2>&1
@@ -199,6 +203,9 @@ get_OperatingSystem
 get_Distribution
 if [[ "${os}" = "Linux" ]]; then
     case ${distribution} in
+        "Red Hat Enterprise Linux"
+            echo "looks good so far."
+            ;;
         "Fedora" )
             if [[ "${version}" != 3* ]]; then
                 echo -e "Error: This is not a supported version of Fedora"
@@ -220,7 +227,7 @@ if [[ "${os}" = "Linux" ]]; then
                 echo "Installing VirtualBox as well."
                 install_VirtualBox
             fi
-        ;;
+            ;;
         "CentOS Linux" )
             if [[ "${version}" -ne "7" && "${version}" -ne "8" ]]; then
                 echo -e "Error: This is not a supported version of CentOS"
@@ -245,14 +252,14 @@ if [[ "${os}" = "Linux" ]]; then
                 echo "Installing VirtualBox as well.\n"
                 install_VirtualBox
             fi
-        ;;
+            ;;
         "Arch Linux" )
             echo "Arch Linux"
-        ;;
+            ;;
         * )
             echo "This seems to be an unsupported Linux distribution."
             exit 1
-        ;;
+            ;;
     esac
 elif [[ "${os}" = "AIX" ]]; then
     echo -e "Error: I'm so sorry, but AIX is currently not supported"
