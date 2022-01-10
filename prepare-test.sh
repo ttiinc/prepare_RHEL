@@ -203,7 +203,7 @@ get_OperatingSystem
 get_Distribution
 if [[ "${os}" = "Linux" ]]; then
     case ${distribution} in
-        "Red Hat Enterprise Linux"
+        "Red Hat Enterprise Linux" )
             echo "looks good so far."
             ;;
         "Fedora" )
