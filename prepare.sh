@@ -283,9 +283,6 @@ Fedora3x_prepare () {
     hostnamectl set-hostname ${gethostname}
 }
 
-Fedora3x_install_packages () {
-}
- 
 CentOS_7 () {
     echo "Installing Repository: Extra Packages for Enterprise Linux 7"
     yum install -y epel-release >> ${logfile} 2>&1
