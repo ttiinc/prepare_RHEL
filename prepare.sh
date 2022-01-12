@@ -255,7 +255,7 @@ FilesXorg_query () {
 
 FilesXorg_copy () {
     if [[ "${FilesXorg}" = "yes" ]]; then
-        echo "Copying files."
+        printf "Copying Xorg related files."
         cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
         cp ${cdir}/etc/sddm.conf /etc
         cp ${cdir}/X.org.files/dwm.desktop /usr/share/xsessions
@@ -263,17 +263,17 @@ FilesXorg_copy () {
     fi
 }
 
-RHEL8_packages_query () {
+RHEL8_CodereadyBuilder_query () {
     while true; do
-        printf "\nCopy Xorg related files? (Yes|No) >> "
+        printf "\nEnable CodeReady Linux Builder? (Yes|No) >> "
         read antwoord
         case ${antwoord} in
             [yY] | [yY][Ee][Ss] )
-                EnableSDDM=yes
+                EnableCodeReady=yes
                 break
             ;;
             [nN] | [nN][Oo] )
-                EnableSDDM=no
+                EnableCodeReady=no
                 break
             ;;
             *)
@@ -283,17 +283,24 @@ RHEL8_packages_query () {
     done
 }
 
+RHEL8_CodereadyBuilder_enable () {
+    if [[ "${EnableCodeReady}" = "yes" ]]; then
+        printf "Enabling CodeReady Linux Builder."
+        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    fi
+}
+
 RHEL8_packages_query () {
     while true; do
-        printf "\nCopy Xorg related files? (Yes|No) >> "
+        printf "\nInstall default packages? (Yes|No) >> "
         read antwoord
         case ${antwoord} in
             [yY] | [yY][Ee][Ss] )
-                EnableSDDM=yes
+                InstallDefaultPackages=yes
                 break
             ;;
             [nN] | [nN][Oo] )
-                EnableSDDM=no
+                InstallDefaultPackages=no
                 break
             ;;
             *)
@@ -304,10 +311,12 @@ RHEL8_packages_query () {
 }
 
 RHEL8_packages_install () {
-    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
-    echo "Installing the following packages:"
-    echo ${packages[@]}
-    # dnf install -y ${packages[@]} >> ${logfile} 2>&1
+    if [[ "${InstallDefaultPackages}" = "yes" ]]; then
+        IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
+        echo "Installing the following packages:"
+        echo ${packages[@]}
+        dnf install -y ${packages[@]} >> ${logfile} 2>&1
+    fi
 }
 
 Fedora3x_prepare () {
@@ -368,7 +377,9 @@ if [[ "${os}" = "Linux" ]]; then
             HostName_query
             SELinux_query
             SDDM_query
-            CopyFilesXorg_query
+            FilesXorg_query
+            RHEL8_CodereadyBuilder_query
+            RHEL8_packages_query
             ;;
         "Fedora" )
             if [[ "${version}" != 3* ]]; then
