@@ -290,7 +290,7 @@ RHEL8_CodereadyBuilder_enable () {
     fi
 }
 
-RHEL8_packages_query () {
+RHEL8_DefaultPackages_query () {
     while true; do
         printf "\nInstall default packages? (Yes|No) >> "
         read antwoord
@@ -310,7 +310,7 @@ RHEL8_packages_query () {
     done
 }
 
-RHEL8_packages_install () {
+RHEL8_DefaultPackages_install () {
     if [[ "${InstallDefaultPackages}" = "yes" ]]; then
         IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
         echo "Installing the following packages:"
@@ -379,7 +379,16 @@ if [[ "${os}" = "Linux" ]]; then
             SDDM_query
             FilesXorg_query
             RHEL8_CodereadyBuilder_query
-            RHEL8_packages_query
+            RHEL8_DefaultPackages_query
+
+            GoogleChrome_install
+            VirtualBox_install
+            HostName_set
+            SELinux_disable
+            SDDM_enable
+            FilesXorg_copy
+            RHEL8_CodereadyBuilder_enable
+            RHEL8_DefaultPackages_install
             ;;
         "Fedora" )
             if [[ "${version}" != 3* ]]; then
