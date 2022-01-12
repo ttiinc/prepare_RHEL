@@ -87,6 +87,36 @@ get_Distribution () {
     echo -e "  ${os} ${distribution} ${version} ${kernel} ${architecture}\n" 
 }
 
+HostName_query () {
+    while true; do
+        printf "\nDo you want to set hostname? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                SetHostname=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                SetHostname=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+    if [[ "${SetHostname}" = "yes" ]]; then
+        printf "\nHostname: >> "
+        read gethostname
+    fi
+}
+
+HostName () {
+    if [[ "${SetHostname}" = "yes" ]]; then
+        hostnamectl set-hostname ${gethostname}
+    fi
+}
+
 GoogleChrome_query () {
     while true; do
         printf "\nDo you want to get Google Chrome installed? (Yes|No) >> "
@@ -108,9 +138,11 @@ GoogleChrome_query () {
 }
 
 GoogleChrome_install () {
-    echo "Installing Repository: google-chrome"
-    cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
-    dnf install -y google-chrome-stable >> ${logfile} 2>&1
+    if [[ "${InstallGoogleChrome}" = "yes"
+        echo "Installing Repository: google-chrome"
+        cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
+        dnf install -y google-chrome-stable >> ${logfile} 2>&1
+    fi
 }
 
 VirtualBox_query () {
@@ -134,12 +166,14 @@ VirtualBox_query () {
 }
 
 VirtualBox_install () {
-    echo "Installing Repository: VirtualBox"
-    cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
-    dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
+    if [[ "${InstallVirtualBox}" = "yes" ]]; then
+        echo "Installing Repository: VirtualBox"
+        cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
+        dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
+    fi
 }
 
-SELINUX_query () {
+SELinux_query () {
     while true; do
         printf "\nDisable SELinux? (Yes|No) >> "
         read antwoord
@@ -159,9 +193,11 @@ SELINUX_query () {
     done
 }
 
-SELINUX_disable () {
-    echo "Disabling SELinux."
-    sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+SELinux_disable () {
+    if [[ "${DisableSELinux}" = "yes" ]]; then
+        echo "Disabling SELinux."
+        sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+    fi
 }
 
 SDDM_query () {
@@ -185,27 +221,29 @@ SDDM_query () {
 }
 
 SDDM_enable () {
-    statusdm="$(systemctl is-active display-manager.service)"
-    if [[ "${statusdm}" = "active" ]]; then
-        echo "Disabling current Display Manager."
-        systemctl disable display-manager.service
+    if [[ "${EnableSDDM}" = "yes" ]]; then
+        statusdm="$(systemctl is-active display-manager.service)"
+        if [[ "${statusdm}" = "active" ]]; then
+            echo "Disabling current Display Manager."
+            systemctl disable display-manager.service
+        fi
+        echo "Enabling SDDM."
+        systemctl enable sddm.service
+        systemctl set-default graphical.target
     fi
-    echo "Enabling SDDM."
-    systemctl enable sddm.service
-    systemctl set-default graphical.target
 }
 
-CopyFilesXorg_query () {
+FilesXorg_query () {
     while true; do
         printf "\nCopy Xorg related files? (Yes|No) >> "
         read antwoord
         case ${antwoord} in
             [yY] | [yY][Ee][Ss] )
-                EnableSDDM=yes
+                FilesXorg=yes
                 break
             ;;
             [nN] | [nN][Oo] )
-                EnableSDDM=no
+                FilesXorg=no
                 break
             ;;
             *)
@@ -215,12 +253,14 @@ CopyFilesXorg_query () {
     done
 }
 
-CopyFilesXorg () {
-    echo "Copying files."
-    cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
-    cp ${cdir}/etc/sddm.conf /etc
-    cp ${cdir}/X.org.files/dwm.desktop /usr/share/xsessions
-    cp ${cdir}/X.org.files/xinit-compat.desktop /usr/share/xsessions
+FilesXorg_copy () {
+    if [[ "${FilesXorg}" = "yes"
+        echo "Copying files."
+        cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
+        cp ${cdir}/etc/sddm.conf /etc
+        cp ${cdir}/X.org.files/dwm.desktop /usr/share/xsessions
+        cp ${cdir}/X.org.files/xinit-compat.desktop /usr/share/xsessions
+    fi
 }
 
 RHEL8_packages_query () {
