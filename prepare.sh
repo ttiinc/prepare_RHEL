@@ -63,10 +63,10 @@ get_User () {
     fi
 }
 
-get_Hostname () {
-    printf "\nHostname: >> "
-    read gethostname
-}
+# get_Hostname () {
+#     printf "\nHostname: >> "
+#     read gethostname
+# }
 
 get_OperatingSystem () {
     os=$(uname -s)
@@ -111,7 +111,7 @@ HostName_query () {
     fi
 }
 
-HostName () {
+HostName_set () {
     if [[ "${SetHostname}" = "yes" ]]; then
         hostnamectl set-hostname ${gethostname}
     fi
@@ -365,7 +365,7 @@ if [[ "${os}" = "Linux" ]]; then
         "Red Hat Enterprise Linux" )
             GoogleChrome_query
             VirtualBox_query
-            Hostname_query
+            HostName_query
             SELinux_query
             SDDM_query
             CopyFilesXorg_query
