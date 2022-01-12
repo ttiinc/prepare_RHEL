@@ -138,7 +138,7 @@ GoogleChrome_query () {
 }
 
 GoogleChrome_install () {
-    if [[ "${InstallGoogleChrome}" = "yes"
+    if [[ "${InstallGoogleChrome}" = "yes" ]]; then
         echo "Installing Repository: google-chrome"
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
