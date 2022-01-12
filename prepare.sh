@@ -7,147 +7,407 @@
 # |                  euis.network(at)de.ttiinc.com                          |
 # +-------------------------------------------------------------------------+
 
+# +----- Variables ---------------------------------------------------------+
 cdir=$(pwd)
 logfile=prepare.log
 
-disable_SELINUX () {
-    sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
-}
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+LIME_YELLOW=$(tput setaf 190)
+POWDER_BLUE=$(tput setaf 153)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+BLINK=$(tput blink)
+REVERSE=$(tput smso)
+UNDERLINE=$(tput smul)
+
+# +----- Functions ---------------------------------------------------------+
 display_Warning () {
     /bin/clear
     /bin/cat ${cdir}/prepare-warning.txt
+    while true; do
+        printf "\n\nDo you want to proceed? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                proceed=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                proceed=no
+                break
+            ;;
+            *)
+                echo " Wut?"
+            ;;
+        esac
+    done
 }
 
-copy_Files () {
+clear_Logfile () {
+    if [[ -f ${logfile} ]]; then
+        rm ${logfile}
+    fi
+}
+
+get_User () {
+    if ! [[ $(id -u) = 0 ]]; then
+        printf "%40s\n" "${RED}Error:${NORMAL} This script must be run as root.\n\n" 
+        exit 1
+    fi
+}
+
+get_Hostname () {
+    printf "\nHostname: >> "
+    read gethostname
+}
+
+get_OperatingSystem () {
+    os=$(uname -s)
+    kernel=$(uname -r)
+    architecture=$(uname -m)
+}
+
+get_Distribution () {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        distribution=$NAME
+        version=$VERSION_ID
+    else
+        echo -e "\nError: I need /etc/os-release to figure what distribution this is."
+        exit 1    
+    fi
+    echo -e "\nSeems to be:"
+    echo -e "  ${os} ${distribution} ${version} ${kernel} ${architecture}\n" 
+}
+
+GoogleChrome_query () {
+    while true; do
+        printf "\nDo you want to get Google Chrome installed? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                InstallGoogleChrome=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                InstallGoogleChrome=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+GoogleChrome_install () {
+    echo "Installing Repository: google-chrome"
+    cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
+    dnf install -y google-chrome-stable >> ${logfile} 2>&1
+}
+
+VirtualBox_query () {
+    while true; do
+        printf "\nDo you want to get VirtualBox installed? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                InstallVirtualBox=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                InstallVirtualBox=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+VirtualBox_install () {
+    echo "Installing Repository: VirtualBox"
+    cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
+    dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
+}
+
+SELINUX_query () {
+    while true; do
+        printf "\nDisable SELinux? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                DisableSELinux=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                DisableSELinux=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+SELINUX_disable () {
+    echo "Disabling SELinux."
+    sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+}
+
+SDDM_query () {
+    while true; do
+        printf "\nEnable Simple Desktop Display Manager? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                EnableSDDM=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                EnableSDDM=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+SDDM_enable () {
+    statusdm="$(systemctl is-active display-manager.service)"
+    if [[ "${statusdm}" = "active" ]]; then
+        echo "Disabling current Display Manager."
+        systemctl disable display-manager.service
+    fi
+    echo "Enabling SDDM."
+    systemctl enable sddm.service
+    systemctl set-default graphical.target
+}
+
+CopyFilesXorg_query () {
+    while true; do
+        printf "\nCopy Xorg related files? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                EnableSDDM=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                EnableSDDM=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+CopyFilesXorg () {
+    echo "Copying files."
     cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
     cp ${cdir}/etc/sddm.conf /etc
     cp ${cdir}/X.org.files/dwm.desktop /usr/share/xsessions
     cp ${cdir}/X.org.files/xinit-compat.desktop /usr/share/xsessions
 }
 
-install_CentOS_7 () {
-    echo -e "\nInstalling Repository: Extra Packages for Enterprise Linux 7"
-    yum install -y epel-release >> ${logfile} 2>&1
-    echo -e "\nInstalling Repository: RPM Fusion for EL 8 - Free - Updates"
-    yum localinstall -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm >> ${logfile} 2>&1
-    echo -e "\nInstalling Repository: RPM Fusion for EL 8 - Nonfree - Updates"
-    yum localinstall -y --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm >> ${logfile} 2>&1
-    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.CentOS8))'
-    echo -e "\nInstalling the following packages:"
+RHEL8_packages_query () {
+    while true; do
+        printf "\nCopy Xorg related files? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                EnableSDDM=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                EnableSDDM=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+RHEL8_packages_query () {
+    while true; do
+        printf "\nCopy Xorg related files? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                EnableSDDM=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                EnableSDDM=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+RHEL8_packages_install () {
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
+    echo "Installing the following packages:"
+    echo ${packages[@]}
+    # dnf install -y ${packages[@]} >> ${logfile} 2>&1
+}
+
+Fedora3x_prepare () {
+    echo "Installing Repository: RPM Fusion for Fedora - Free - Updates"
+    dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >> ${logfile} 2>&1
+    echo "Installing Repository: RPM Fusion for Fedora - Nonfree - Updates"
+    dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm >> ${logfile} 2>&1
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.Fedora3x))'
+    echo "Installing the following packages:"
     echo ${packages[@]}
     dnf install -y ${packages[@]} >> ${logfile} 2>&1
+    echo "Setting hostname to: ${gethostname}"
+    hostnamectl set-hostname ${gethostname}
+}
+
+Fedora3x_install_packages () {
+}
+ 
+CentOS_7 () {
+    echo "Installing Repository: Extra Packages for Enterprise Linux 7"
+    yum install -y epel-release >> ${logfile} 2>&1
+    echo "Installing Repository: RPM Fusion for EL 8 - Free - Updates"
+    yum localinstall -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm >> ${logfile} 2>&1
+    echo -e "Installing Repository: RPM Fusion for EL 8 - Nonfree - Updates"
+    yum localinstall -y --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm >> ${logfile} 2>&1
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.CentOS7))'
+    echo "Installing the following packages:"
+    echo ${packages[@]}
+    yum install -y ${packages[@]} >> ${logfile} 2>&1
 }
 
 install_CentOS_8 () {
-    echo -e "\nInstalling Repository: CentOS-8 - PowerTools"
+    echo "Installing Repository: CentOS-8 - PowerTools"
     dnf config-manager --enable PowerTools >> ${logfile} 2>&1
-    echo -e "\nInstalling Repository: Extra Packages for Enterprise Linux 8"
+    echo "Installing Repository: Extra Packages for Enterprise Linux 8"
     dnf install -y epel-release >> ${logfile} 2>&1
-    echo -e "\nInstalling Repository: RPM Fusion for EL 8 - Free - Updates"
+    echo "Installing Repository: RPM Fusion for EL 8 - Free - Updates"
     dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm >> ${logfile} 2>&1
-    echo -e "\nInstalling Repository: RPM Fusion for EL 8 - Nonfree - Updates"
+    echo "Installing Repository: RPM Fusion for EL 8 - Nonfree - Updates"
     dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-8.noarch.rpm >> ${logfile} 2>&1
     IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.CentOS8))'
-    echo -e "\nInstalling the following packages:"
+    echo "Installing the following packages:"
     echo ${packages[@]}
     dnf install -y ${packages[@]} >> ${logfile} 2>&1
-    systemctl enable sddm
-    systemctl set-default graphical
 }
 
-install_GoogleChrome() {
-    echo -e "\nInstalling Repository: google-chrome"
-    cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
-    yum install -y google-chrome-stable >> ${logfile} 2>&1
-}
-
-install_VirtualBox() {
-    echo -e "\nInstalling Repository: VirtualBox"
-    cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
-    yum install -y VirtualBox-6.0 >> ${logfile} 2>&1
-}
-
-if ! [[ $(/bin/id -u) = 0 ]]; then
-    printf "\n This script must be run as root.\n\n" 
+# +----- Main --------------------------------------------------------------+
+get_User
+display_Warning
+if [[ "${proceed}" = "no" ]]; then
     exit 1
-else
-    if [[ -f ${logfile} ]]; then
-        rm ${logfile}
-    fi
-    if [[ -f /etc/os-release ]]; then
-        . /etc/os-release
-        os=$NAME
-        version=$VERSION_ID
-        if [[ "${os}" = "CentOS Linux" ]]; then
-            display_Warning
-            while true; do
-                printf "\n Do you want to get Google Chrome installed as well? (Yes|No) >> "
-                read antwoord
-                case ${antwoord} in
-                    [yY] | [yY][Ee][Ss] )
-                        InstallGoogleChrome=yes
-                        break
-                    ;;
-                    [nN] | [n|N][O|o] )
-                        InstallGoogleChrome=no
-                        break
-                    ;;
-                    *)
-                        printf "  Wut?"
-                    ;;
-                esac
-            done
+fi
 
-            while true; do
-                printf "\n Do you want to get VirtualBox installed as well? (Yes|No) >> "
-                read antwoord
-                case ${antwoord} in
-                    [yY] | [yY][Ee][Ss] )
-                        InstallVirtualBox=yes
-                        break
-                    ;;
-                    [nN] | [n|N][O|o] )
-                        InstallVirtualBox=no
-                        break
-                    ;;
-                    *)
-                        printf "  Wut?"
-                    ;;
-                esac
-            done
-
-            if [[ "${version}" = "7" ]]; then
-                printf "\n This is CentOS Linux Version 7.\n"
-                disable_SELINUX
-                copy_Files
-                install_CentOS_7
-            elif [[ "${version}" == "8" ]]; then
-                printf "\n This is CentOS Linux Version 8.\n"
-                disable_SELINUX
-                copy_Files
-                install_CentOS_8
+get_OperatingSystem
+get_Distribution
+if [[ "${os}" = "Linux" ]]; then
+    case ${distribution} in
+        "Red Hat Enterprise Linux" )
+            GoogleChrome_query
+            VirtualBox_query
+            Hostname_query
+            SELinux_query
+            SDDM_query
+            CopyFilesXorg_query
+            ;;
+        "Fedora" )
+            if [[ "${version}" != 3* ]]; then
+                echo -e "Error: This is not a supported version of Fedora"
+                exit 1
             fi
-
-            if [[ "${InstallGoogleChrome}" == "yes" ]]; then
-                printf "\n Installing Google Chrome as well.\n"
+            get_GoogleChrome
+            get_VirtualBox
+            get_Hostname
+            disable_SELINUX
+            copy_Files
+            install_Fedora3x
+            enable_SDDM
+            if [[ "${InstallGoogleChrome}" = "yes" ]]; then
+                echo "Installing Google Chrome as well."
                 install_GoogleChrome
             fi
 
-            if [[ "${InstallVirtualBox}" == "yes" ]]; then
-                printf "\n Installing VirtualBox as well.\n"
+            if [[ "${InstallVirtualBox}" = "yes" ]]; then
+                echo "Installing VirtualBox as well."
                 install_VirtualBox
             fi
+            ;;
+        "CentOS Linux" )
+            if [[ "${version}" -ne "7" && "${version}" -ne "8" ]]; then
+                echo -e "Error: This is not a supported version of CentOS"
+                exit 1
+            fi
+            get_GoogleChrome
+            get_VirtualBox
+            disable_SELINUX
+            copy_Files
+            enable_SDDM
+            if [[ "${version}" = "7" ]]; then
+                install_CentOS_7
+            elif [[ "${version}" = "8" ]]; then
+                install_CentOS_8
+            fi
+            if [[ "${InstallGoogleChrome}" = "yes" ]]; then
+                echo "Installing Google Chrome as well.\n"
+                install_GoogleChrome
+            fi
 
-        else
-            printf " This is not CentOS.\n\n"
+            if [[ "${InstallVirtualBox}" = "yes" ]]; then
+                echo "Installing VirtualBox as well.\n"
+                install_VirtualBox
+            fi
+            ;;
+        "Arch Linux" )
+            echo "Arch Linux"
+            ;;
+        * )
+            echo "This seems to be an unsupported Linux distribution."
             exit 1
-        fi
-    else
-            printf "\n Could not find /etc/os-release."
-            printf "\n Is this even Linux?!\n\n"
-            exit 1
-    fi
+            ;;
+    esac
+elif [[ "${os}" = "AIX" ]]; then
+    echo -e "Error: I'm so sorry, but AIX is currently not supported"
+    exit 1
+
+elif [[ "${os}" = "SunOS" ]]; then
+    echo -e "Error: I'm so sorry, but SunOS/Solaris is currently not supported"
+    exit 1
+
+elif [[ "${os}" = "Darwin" ]]; then
+    echo -e "Error: I'm so sorry, but Darwin is currently not supported"
+    exit 1
+
+elif [[ "${os}" = "FreeBSD" ]]; then
+    echo -e "Warning: Support for FreeBSD is currently ridimentary."
+    get_Distribution
 fi
 
-printf "\n I'm done.\n\n"
+
+echo -e "I'm done.\n\n"
 exit 0
+
+
+
