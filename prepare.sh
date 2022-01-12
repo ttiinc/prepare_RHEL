@@ -254,7 +254,7 @@ FilesXorg_query () {
 }
 
 FilesXorg_copy () {
-    if [[ "${FilesXorg}" = "yes"
+    if [[ "${FilesXorg}" = "yes" ]]; then
         echo "Copying files."
         cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
         cp ${cdir}/etc/sddm.conf /etc
