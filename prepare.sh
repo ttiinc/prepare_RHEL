@@ -58,7 +58,7 @@ clear_Logfile () {
 
 get_User () {
     if ! [[ $(id -u) = 0 ]]; then
-        printf "%40s\n" "${RED}Error:${NORMAL} This script must be run as root.\n\n" 
+        printf "${RED}Error:${NORMAL} This script must be run as root.\n\n" 
         exit 1
     fi
 }
