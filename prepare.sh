@@ -8,8 +8,9 @@
 # +-------------------------------------------------------------------------+
 
 # +----- Variables ---------------------------------------------------------+
+datetime="$(date "+%Y-%m-%d-%H-%M-%S")"
 cdir=$(pwd)
-logfile=prepare.log
+logfile="/tmp/prepare_RHEL_${datetime}.log"
 
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
@@ -37,9 +38,9 @@ antwoord () {
         fi
 }
 
-display_Warning () {
+display_Notice () {
     clear
-    cat ${cdir}/prepare-warning.txt
+    cat ${cdir}/notice.txt
     proceed="$(antwoord "Do you want to proceed? (Yes|No) >> ")"
 }
 
@@ -233,7 +234,7 @@ install_CentOS_8 () {
 
 # +----- Main --------------------------------------------------------------+
 get_User
-display_Warning
+display_Notice
 if [[ "${proceed}" = "no" ]]; then
     exit 1
 fi
