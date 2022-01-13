@@ -111,23 +111,7 @@ HostName_set () {
 }
 
 GoogleChrome_query () {
-    while true; do
-        printf "\nDo you want to get Google Chrome installed? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                InstallGoogleChrome=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                InstallGoogleChrome=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    InstallGoogleChrome="$(antwoord "Do you want to get Google Chrome installed? (Yes|No) >> ")"
 }
 
 GoogleChrome_install () {
