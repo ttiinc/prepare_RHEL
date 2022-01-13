@@ -28,6 +28,15 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # +----- Functions ---------------------------------------------------------+
+antwoord () {
+    read -p "${1}" antwoord
+        if [[ ${antwoord} == [yY] || ${antwoord} == [yY][Ee][Ss] ]]; then
+            echo "yes"
+        else
+            echo "no"
+        fi
+}
+
 display_Warning () {
     /bin/clear
     /bin/cat ${cdir}/prepare-warning.txt
@@ -88,26 +97,10 @@ get_Distribution () {
 }
 
 HostName_query () {
-    while true; do
-        printf "\nDo you want to set hostname? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                SetHostname=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                SetHostname=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    SetHostname="$(antwoord "Do you want to set hostname? (Yes|No) >> ")"
     if [[ "${SetHostname}" = "yes" ]]; then
-        printf "\nHostname: >> "
-        read gethostname
+        # printf "\nHostname: >> "
+        read -p "Hostname: " gethostname
     fi
 }
 
@@ -290,6 +283,33 @@ RHEL8_CodereadyBuilder_enable () {
     fi
 }
 
+RHEL8_EPEL_query () {
+    while true; do
+        printf "\nEnable Extra Packages for Enterprise Linux (EPEL)? (Yes|No) >> "
+        read antwoord
+        case ${antwoord} in
+            [yY] | [yY][Ee][Ss] )
+                EnableEPEL=yes
+                break
+            ;;
+            [nN] | [nN][Oo] )
+                EnableEPEL=no
+                break
+            ;;
+            *)
+                echo "  Wut?"
+            ;;
+        esac
+    done
+}
+
+RHEL8_EPEL_enable () {
+    if [[ "${EnableEPEL}" = "yes" ]]; then
+        printf "Enabling CodeReady Linux Builder."
+        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    fi
+}
+
 RHEL8_DefaultPackages_query () {
     while true; do
         printf "\nInstall default packages? (Yes|No) >> "
@@ -376,8 +396,6 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_query
             HostName_query
             SELinux_query
-            SDDM_query
-            FilesXorg_query
             RHEL8_CodereadyBuilder_query
             RHEL8_DefaultPackages_query
 
@@ -385,8 +403,6 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_install
             HostName_set
             SELinux_disable
-            SDDM_enable
-            FilesXorg_copy
             RHEL8_CodereadyBuilder_enable
             RHEL8_DefaultPackages_install
             ;;
