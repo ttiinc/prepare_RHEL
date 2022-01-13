@@ -38,25 +38,9 @@ antwoord () {
 }
 
 display_Warning () {
-    /bin/clear
-    /bin/cat ${cdir}/prepare-warning.txt
-    while true; do
-        printf "\n\nDo you want to proceed? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                proceed=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                proceed=no
-                break
-            ;;
-            *)
-                echo " Wut?"
-            ;;
-        esac
-    done
+    clear
+    cat ${cdir}/prepare-warning.txt
+    proceed="$(antwoord "Do you want to proceed? (Yes|No) >> ")"
 }
 
 clear_Logfile () {
@@ -71,11 +55,6 @@ get_User () {
         exit 1
     fi
 }
-
-# get_Hostname () {
-#     printf "\nHostname: >> "
-#     read gethostname
-# }
 
 get_OperatingSystem () {
     os=$(uname -s)
@@ -123,23 +102,7 @@ GoogleChrome_install () {
 }
 
 VirtualBox_query () {
-    while true; do
-        printf "\nDo you want to get VirtualBox installed? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                InstallVirtualBox=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                InstallVirtualBox=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    InstallVirtualBox="$(antwoord "Do you want to get VirtualBox installed? (Yes|No) >> ")"
 }
 
 VirtualBox_install () {
@@ -151,23 +114,7 @@ VirtualBox_install () {
 }
 
 SELinux_query () {
-    while true; do
-        printf "\nDisable SELinux? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                DisableSELinux=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                DisableSELinux=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    DisableSELinux="$(antwoord "Disable SELinux? (Yes|No) >> ")"
 }
 
 SELinux_disable () {
@@ -178,23 +125,7 @@ SELinux_disable () {
 }
 
 SDDM_query () {
-    while true; do
-        printf "\nEnable Simple Desktop Display Manager? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                EnableSDDM=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                EnableSDDM=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    EnableSDDM="$(antwoord "Enable Simple Desktop Display Manager? (Yes|No) >> ")"
 }
 
 SDDM_enable () {
@@ -211,23 +142,7 @@ SDDM_enable () {
 }
 
 FilesXorg_query () {
-    while true; do
-        printf "\nCopy Xorg related files? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                FilesXorg=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                FilesXorg=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    FilesXorg="$(antwoord "Copy Xorg related files? (Yes|No) >> ")"
 }
 
 FilesXorg_copy () {
@@ -241,23 +156,7 @@ FilesXorg_copy () {
 }
 
 RHEL8_CodereadyBuilder_query () {
-    while true; do
-        printf "\nEnable CodeReady Linux Builder? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                EnableCodeReady=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                EnableCodeReady=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    EnableCodeReady="$(antwoord "Enable CodeReady Linux Builder? (Yes|No) >> ")"
 }
 
 RHEL8_CodereadyBuilder_enable () {
@@ -268,23 +167,7 @@ RHEL8_CodereadyBuilder_enable () {
 }
 
 RHEL8_EPEL_query () {
-    while true; do
-        printf "\nEnable Extra Packages for Enterprise Linux (EPEL)? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                EnableEPEL=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                EnableEPEL=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    EnableEPEL="$(antwoord "Enable Extra Packages for Enterprise Linux (EPEL)? (Yes|No) >> ")"
 }
 
 RHEL8_EPEL_enable () {
@@ -295,23 +178,7 @@ RHEL8_EPEL_enable () {
 }
 
 RHEL8_DefaultPackages_query () {
-    while true; do
-        printf "\nInstall default packages? (Yes|No) >> "
-        read antwoord
-        case ${antwoord} in
-            [yY] | [yY][Ee][Ss] )
-                InstallDefaultPackages=yes
-                break
-            ;;
-            [nN] | [nN][Oo] )
-                InstallDefaultPackages=no
-                break
-            ;;
-            *)
-                echo "  Wut?"
-            ;;
-        esac
-    done
+    InstallDefaultPackages="$(antwoord "Install default packages? (Yes|No) >> ")"
 }
 
 RHEL8_DefaultPackages_install () {
@@ -462,9 +329,5 @@ elif [[ "${os}" = "FreeBSD" ]]; then
     get_Distribution
 fi
 
-
 echo -e "I'm done.\n\n"
 exit 0
-
-
-
