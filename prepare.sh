@@ -54,7 +54,7 @@ echo_right() {
     text=${1}
     echo
     tput cuu1
-    tput cuf "((${width} - 1))"
+    tput cuf "${width}"
     tput cub ${#text}
     echo "${text}"
 }
