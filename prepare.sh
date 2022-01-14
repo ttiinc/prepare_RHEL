@@ -108,26 +108,26 @@ display_Notice() {
     proceed="$(antwoord "Do you want to proceed? (Yes|No) >> ")"
 }
 
-clear_Logfile () {
+clear_Logfile() {
     if [[ -f ${logfile} ]]; then
         rm ${logfile}
     fi
 }
 
-get_User () {
+get_User() {
     if ! [[ $(id -u) = 0 ]]; then
         printf "${RED}Error:${NORMAL} This script must be run as root.\n\n" 
         exit 1
     fi
 }
 
-get_OperatingSystem () {
+get_OperatingSystem() {
     os=$(uname -s)
     kernel=$(uname -r)
     architecture=$(uname -m)
 }
 
-get_Distribution () {
+get_Distribution() {
     if [[ -f /etc/os-release ]]; then
         . /etc/os-release
         distribution=$NAME
@@ -140,14 +140,14 @@ get_Distribution () {
     echo -e "  ${os} ${distribution} ${version} ${kernel} ${architecture}\n" 
 }
 
-HostName_query () {
+HostName_query() {
     SetHostname="$(antwoord "Do you want to set hostname? (Yes|No) >> ")"
     if [[ "${SetHostname}" = "yes" ]]; then
         read -p "Hostname: " gethostname
     fi
 }
 
-HostName_set () {
+HostName_set() {
     echo -n -e "Setting Hostname to: ${gethostname}\r"
     if [[ "${SetHostname}" = "yes" ]]; then
         hostnamectl set-hostname ${gethostname}
@@ -157,11 +157,11 @@ HostName_set () {
     fi
 }
 
-GoogleChrome_query () {
+GoogleChrome_query() {
     InstallGoogleChrome="$(antwoord "Do you want to get Google Chrome installed? (Yes|No) >> ")"
 }
 
-GoogleChrome_install () {
+GoogleChrome_install() {
     echo -n -e "Installing Repository: google-chrome\r"
     if [[ "${InstallGoogleChrome}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
@@ -172,11 +172,11 @@ GoogleChrome_install () {
     fi
 }
 
-VirtualBox_query () {
+VirtualBox_query() {
     InstallVirtualBox="$(antwoord "Do you want to get VirtualBox installed? (Yes|No) >> ")"
 }
 
-VirtualBox_install () {
+VirtualBox_install() {
     echo -n -e "Installing Repository: VirtualBox\r"
     if [[ "${InstallVirtualBox}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
@@ -187,11 +187,11 @@ VirtualBox_install () {
     fi
 }
 
-SELinux_query () {
+SELinux_query() {
     DisableSELinux="$(antwoord "Disable SELinux? (Yes|No) >> ")"
 }
 
-SELinux_disable () {
+SELinux_disable() {
     echo -n -e "Disabling SELinux.\r"
     if [[ "${DisableSELinux}" = "yes" ]]; then
         sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
@@ -201,11 +201,11 @@ SELinux_disable () {
     fi
 }
 
-SDDM_query () {
+SDDM_query() {
     EnableSDDM="$(antwoord "Enable Simple Desktop Display Manager? (Yes|No) >> ")"
 }
 
-SDDM_enable () {
+SDDM_enable() {
     if [[ "${EnableSDDM}" = "yes" ]]; then
         statusdm="$(systemctl is-active display-manager.service)"
         if [[ "${statusdm}" = "active" ]]; then
@@ -235,11 +235,11 @@ SUDO_Timeout_set() {
     fi
 }
 
-FilesXorg_query () {
+FilesXorg_query() {
     FilesXorg="$(antwoord "Copy Xorg related files? (Yes|No) >> ")"
 }
 
-FilesXorg_copy () {
+FilesXorg_copy() {
     if [[ "${FilesXorg}" = "yes" ]]; then
         printf "Copying Xorg related files."
         cp ${cdir}/etc/X11/xorg.conf.d/*.conf /etc/X11/xorg.conf.d
@@ -249,11 +249,11 @@ FilesXorg_copy () {
     fi
 }
 
-RHEL8_CodereadyBuilder_query () {
+RHEL8_CodereadyBuilder_query() {
     EnableCodeReady="$(antwoord "Enable CodeReady Linux Builder? (Yes|No) >> ")"
 }
 
-RHEL8_CodereadyBuilder_enable () {
+RHEL8_CodereadyBuilder_enable() {
     printf "Enabling CodeReady Linux Builder."
     if [[ "${EnableCodeReady}" = "yes" ]]; then
         subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms >> ${logfile} 2>&1
@@ -263,11 +263,11 @@ RHEL8_CodereadyBuilder_enable () {
     fi
 }
 
-RHEL8_DefaultPackages_query () {
+RHEL8_DefaultPackages_query() {
     InstallDefaultPackages="$(antwoord "Install default packages? (Yes|No) >> ")"
 }
 
-RHEL8_DefaultPackages_install () {
+RHEL8_DefaultPackages_install() {
     echo -n -e "Installing Default Packages.\r"
     if [[ "${InstallDefaultPackages}" = "yes" ]]; then
         IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
@@ -278,7 +278,7 @@ RHEL8_DefaultPackages_install () {
     fi
 }
 
-Fedora3x_prepare () {
+Fedora3x_prepare() {
     echo "Installing Repository: RPM Fusion for Fedora - Free - Updates"
     dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >> ${logfile} 2>&1
     echo "Installing Repository: RPM Fusion for Fedora - Nonfree - Updates"
@@ -291,7 +291,7 @@ Fedora3x_prepare () {
     hostnamectl set-hostname ${gethostname}
 }
 
-CentOS_7 () {
+CentOS_7() {
     echo "Installing Repository: Extra Packages for Enterprise Linux 7"
     yum install -y epel-release >> ${logfile} 2>&1
     echo "Installing Repository: RPM Fusion for EL 8 - Free - Updates"
@@ -304,7 +304,7 @@ CentOS_7 () {
     yum install -y ${packages[@]} >> ${logfile} 2>&1
 }
 
-install_CentOS_8 () {
+install_CentOS_8() {
     echo "Installing Repository: CentOS-8 - PowerTools"
     dnf config-manager --enable PowerTools >> ${logfile} 2>&1
     echo "Installing Repository: Extra Packages for Enterprise Linux 8"
