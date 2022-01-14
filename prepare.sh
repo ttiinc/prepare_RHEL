@@ -218,6 +218,23 @@ SDDM_enable () {
     fi
 }
 
+SUDO_Timeout_query() {
+    SetSudoTimeout="$(antwoord "Set SUDO Password Timeout? (Yes|No) >> ")"
+    if [[ "${SetSudoTimeout}" = "yes" ]]; then
+        read -p "SUDO Password Timeout: " getsudotimeout
+    fi
+}
+
+SUDO_Timeout_set() {
+    echo -n -e "Setting SUDO Timeout to: ${getsudotimeout}\r"
+    if [[ "${SetSudoTimeout}" = "yes" ]]; then
+        echo -e "\nDefaults timestamp_timeout=-1" >> /etc/sudoers
+        echo_Done
+    else
+        echo_Skipped
+    fi
+}
+
 FilesXorg_query () {
     FilesXorg="$(antwoord "Copy Xorg related files? (Yes|No) >> ")"
 }
@@ -320,13 +337,17 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_query
             HostName_query
             SELinux_query
+            SUDO_Timeout_query
             RHEL8_CodereadyBuilder_query
             RHEL8_DefaultPackages_query
+
             echo_title "Prepare"
+
             GoogleChrome_install
             VirtualBox_install
             HostName_set
             SELinux_disable
+            SUDO_Timeout_set
             RHEL8_CodereadyBuilder_enable
             RHEL8_DefaultPackages_install
             ;;
