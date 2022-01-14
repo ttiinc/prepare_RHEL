@@ -11,6 +11,7 @@
 datetime="$(date "+%Y-%m-%d-%H-%M-%S")"
 cdir=$(pwd)
 logfile="/tmp/prepare_RHEL_${datetime}.log"
+width=80
 
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
@@ -29,6 +30,26 @@ REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
 # +----- Functions ---------------------------------------------------------+
+echo_equals() {
+	counter=0
+	while [  $counter -lt "$1" ]; do
+		printf '='
+		(( counter=counter+1 ))
+	done
+}
+
+echo_title() {
+	title=$1
+	ncols=$(tput cols)
+	nequals=$(((width-${#title})/2-1))
+	tput setaf 3 0 0 # 3 = yellow
+	echo_equals "$nequals"
+	printf " %s " "$title"
+	echo_equals "$nequals"
+	tput sgr0  # reset terminal
+	echo
+}
+
 antwoord () {
     read -p "${1}" antwoord
         if [[ ${antwoord} == [yY] || ${antwoord} == [yY][Ee][Ss] ]]; then
@@ -40,7 +61,9 @@ antwoord () {
 
 display_Notice () {
     clear
+    tput setaf 4
     cat ${cdir}/notice.txt
+    tput sgr0
     proceed="$(antwoord "Do you want to proceed? (Yes|No) >> ")"
 }
 
@@ -239,6 +262,8 @@ if [[ "${proceed}" = "no" ]]; then
     exit 1
 fi
 
+echo_title "Choose Options"
+
 get_OperatingSystem
 get_Distribution
 if [[ "${os}" = "Linux" ]]; then
@@ -250,7 +275,7 @@ if [[ "${os}" = "Linux" ]]; then
             SELinux_query
             RHEL8_CodereadyBuilder_query
             RHEL8_DefaultPackages_query
-
+            echo "Prepare"
             GoogleChrome_install
             VirtualBox_install
             HostName_set
@@ -330,5 +355,6 @@ elif [[ "${os}" = "FreeBSD" ]]; then
     get_Distribution
 fi
 
-echo -e "I'm done.\n\n"
+echo_title "I'm done."
+echo -e "\n\n"
 exit 0
