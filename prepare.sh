@@ -140,6 +140,11 @@ get_Distribution() {
     echo -e "  ${os} ${distribution} ${version} ${kernel} ${architecture}\n" 
 }
 
+LogfileLocation() {
+    echo -n -e "\nLogfile: ${logfile}\r"
+    echo_OK
+}
+
 HostName_query() {
     SetHostname="$(antwoord "Do you want to set hostname? (Yes|No) >> ")"
     if [[ "${SetHostname}" = "yes" ]]; then
@@ -350,6 +355,7 @@ if [[ "${os}" = "Linux" ]]; then
             SUDO_Timeout_set
             RHEL8_CodereadyBuilder_enable
             RHEL8_DefaultPackages_install
+            LogfileLocation
             ;;
         "Fedora" )
             if [[ "${version}" != 3* ]]; then
