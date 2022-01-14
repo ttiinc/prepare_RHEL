@@ -44,7 +44,9 @@ echo_title() {
 	nequals=$(((width-${#title})/2-1))
 	tput setaf 4 0 0
 	echo_equals "$nequals"
+	tput setaf 6 0 0
 	printf " %s " "$title"
+	tput setaf 4 0 0
 	echo_equals "$nequals"
 	tput sgr0
 	echo
