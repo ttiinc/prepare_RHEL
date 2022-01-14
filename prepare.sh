@@ -50,7 +50,7 @@ echo_title() {
 	echo
 }
 
-echo_right() {
+echo_Right() {
     text=${1}
     echo
     tput cuu1
@@ -59,11 +59,30 @@ echo_right() {
     echo "${text}"
 }
 
-echo_success() {
+echo_OK() {
     tput setaf 2 0 0
-    echo_right "[ OK ]"
+    echo_Right "[ OK ]"
     tput sgr0
 }
+
+echo_Done() {
+    tput setaf 2 0 0
+    echo_Right "[ Done ]"
+    tput sgr0
+}
+
+echo_NotNeeded() {
+    tput setaf 3 0 0
+    echo_Right "[ Done ]"
+    tput sgr0
+}
+
+echo_Failed() {
+    tput setaf 1 0 0
+    echo_Right "[ Failed ]"
+    tput sgr0
+}
+
 antwoord() {
     read -p "${1}" antwoord
         if [[ ${antwoord} == [yY] || ${antwoord} == [yY][Ee][Ss] ]]; then
@@ -122,10 +141,12 @@ HostName_query () {
 }
 
 HostName_set () {
+    echo -n -e "Setting Hostname to: ${gethostname}\r"
     if [[ "${SetHostname}" = "yes" ]]; then
-        echo -n -e "Setting Hostname to: ${gethostname}\r"
         hostnamectl set-hostname ${gethostname}
-        echo_success
+        echo_Done
+    else
+        echo_NotNeeded
     fi
 }
 
@@ -134,11 +155,13 @@ GoogleChrome_query () {
 }
 
 GoogleChrome_install () {
+    echo "Installing Repository: google-chrome"
     if [[ "${InstallGoogleChrome}" = "yes" ]]; then
-        echo "Installing Repository: google-chrome"
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
-        echo_success
+        echo_Done
+    else
+        echo_NotNeeded
     fi
 }
 
@@ -147,10 +170,13 @@ VirtualBox_query () {
 }
 
 VirtualBox_install () {
+    echo "Installing Repository: VirtualBox"
     if [[ "${InstallVirtualBox}" = "yes" ]]; then
-        echo "Installing Repository: VirtualBox"
         cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
         dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
+        echo_Done
+    else
+        echo_NotNeeded
     fi
 }
 
@@ -159,9 +185,12 @@ SELinux_query () {
 }
 
 SELinux_disable () {
+    echo "Disabling SELinux."
     if [[ "${DisableSELinux}" = "yes" ]]; then
-        echo "Disabling SELinux."
         sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
+        echo_Done
+    else
+        echo_NotNeeded
     fi
 }
 
