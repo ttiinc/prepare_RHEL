@@ -233,7 +233,7 @@ SUDO_Timeout_query() {
 SUDO_Timeout_set() {
     echo -n -e "Setting SUDO Timeout to: ${getsudotimeout}\r"
     if [[ "${SetSudoTimeout}" = "yes" ]]; then
-        echo -e "\nDefaults timestamp_timeout=-1" >> /etc/sudoers
+        echo -e "\nDefaults timestamp_timeout=${getsudotimeout}" >> /etc/sudoers
         echo_Done
     else
         echo_Skipped
