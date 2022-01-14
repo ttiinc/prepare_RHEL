@@ -135,7 +135,6 @@ get_Distribution () {
 HostName_query () {
     SetHostname="$(antwoord "Do you want to set hostname? (Yes|No) >> ")"
     if [[ "${SetHostname}" = "yes" ]]; then
-        # printf "\nHostname: >> "
         read -p "Hostname: " gethostname
     fi
 }
@@ -155,7 +154,7 @@ GoogleChrome_query () {
 }
 
 GoogleChrome_install () {
-    echo "Installing Repository: google-chrome"
+    echo -n -e "Installing Repository: google-chrome\n"
     if [[ "${InstallGoogleChrome}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
@@ -170,7 +169,7 @@ VirtualBox_query () {
 }
 
 VirtualBox_install () {
-    echo "Installing Repository: VirtualBox"
+    echo -n -e "Installing Repository: VirtualBox\n"
     if [[ "${InstallVirtualBox}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
         dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
@@ -185,7 +184,7 @@ SELinux_query () {
 }
 
 SELinux_disable () {
-    echo "Disabling SELinux."
+    echo -n -e "Disabling SELinux.\n"
     if [[ "${DisableSELinux}" = "yes" ]]; then
         sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
         echo_Done
