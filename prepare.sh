@@ -237,7 +237,7 @@ RHEL8_CodereadyBuilder_query () {
 RHEL8_CodereadyBuilder_enable () {
     printf "Enabling CodeReady Linux Builder."
     if [[ "${EnableCodeReady}" = "yes" ]]; then
-        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms >> ${logfile} 2>&1
         echo_Done
     else
         echo_Skipped
