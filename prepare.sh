@@ -42,11 +42,11 @@ echo_title() {
 	title=$1
 	ncols=$(tput cols)
 	nequals=$(((width-${#title})/2-1))
-	tput setaf 3 0 0 # 3 = yellow
+	tput setaf 4 0 0
 	echo_equals "$nequals"
 	printf " %s " "$title"
 	echo_equals "$nequals"
-	tput sgr0  # reset terminal
+	tput sgr0
 	echo
 }
 
