@@ -123,7 +123,9 @@ HostName_query () {
 
 HostName_set () {
     if [[ "${SetHostname}" = "yes" ]]; then
+        echo "Setting Hostname to: ${gethostname}"
         hostnamectl set-hostname ${gethostname}
+        echo_success
     fi
 }
 
