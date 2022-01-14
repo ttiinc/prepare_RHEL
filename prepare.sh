@@ -192,6 +192,20 @@ VirtualBox_install() {
     fi
 }
 
+SshRootLogin_query() {
+    DisableSshRoot="$(antwoord "Disable SSH login for root user? (Yes|No) >> ")"
+}
+
+SshRootLogin_disable() {
+    echo -n -e "Disabling SSH login for root user.\r"
+    if [[ "${DisableSshRoot}" = "yes" ]]; then
+        sed -i s/^PermitRootLogin yes/PermitRootLogin no/ /etc/ssh/sshd_config
+        echo_Done
+    else
+        echo_Skipped
+    fi
+}
+
 SELinux_query() {
     DisableSELinux="$(antwoord "Disable SELinux? (Yes|No) >> ")"
 }
@@ -343,6 +357,7 @@ if [[ "${os}" = "Linux" ]]; then
             HostName_query
             SELinux_query
             SUDO_Timeout_query
+            SshRootLogin_query
             RHEL8_CodereadyBuilder_query
             RHEL8_DefaultPackages_query
 
@@ -352,6 +367,7 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_install
             HostName_set
             SELinux_disable
+            SshRootLogin_disable
             SUDO_Timeout_set
             RHEL8_CodereadyBuilder_enable
             RHEL8_DefaultPackages_install
