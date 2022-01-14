@@ -73,7 +73,13 @@ echo_Done() {
 
 echo_NotNeeded() {
     tput setaf 3 0 0
-    echo_Right "[ Done ]"
+    echo_Right "[ Not Needed ]"
+    tput sgr0
+}
+
+echo_Skipped() {
+    tput setaf 3 0 0
+    echo_Right "[ Skipped ]"
     tput sgr0
 }
 
@@ -145,7 +151,7 @@ HostName_set () {
         hostnamectl set-hostname ${gethostname}
         echo_Done
     else
-        echo_NotNeeded
+        echo_Skipped
     fi
 }
 
@@ -160,7 +166,7 @@ GoogleChrome_install () {
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
         echo_Done
     else
-        echo_NotNeeded
+        echo_Skipped
     fi
 }
 
@@ -175,7 +181,7 @@ VirtualBox_install () {
         dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
         echo_Done
     else
-        echo_NotNeeded
+        echo_Skipped
     fi
 }
 
@@ -189,7 +195,7 @@ SELinux_disable () {
         sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
         echo_Done
     else
-        echo_NotNeeded
+        echo_Skipped
     fi
 }
 
@@ -229,20 +235,12 @@ RHEL8_CodereadyBuilder_query () {
 }
 
 RHEL8_CodereadyBuilder_enable () {
+    printf "Enabling CodeReady Linux Builder."
     if [[ "${EnableCodeReady}" = "yes" ]]; then
-        printf "Enabling CodeReady Linux Builder."
         subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-    fi
-}
-
-RHEL8_EPEL_query () {
-    EnableEPEL="$(antwoord "Enable Extra Packages for Enterprise Linux (EPEL)? (Yes|No) >> ")"
-}
-
-RHEL8_EPEL_enable () {
-    if [[ "${EnableEPEL}" = "yes" ]]; then
-        printf "Enabling CodeReady Linux Builder."
-        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+        echo_Done
+    else
+        echo_Skipped
     fi
 }
 
@@ -251,11 +249,13 @@ RHEL8_DefaultPackages_query () {
 }
 
 RHEL8_DefaultPackages_install () {
+    echo -n -e "Installing Default Packages.\r"
     if [[ "${InstallDefaultPackages}" = "yes" ]]; then
         IFS=$'\r\n' GLOBIGNORE='*' command eval  'packages=($(cat ./packages.RHEL8))'
-        echo "Installing the following packages:"
-        echo ${packages[@]}
         dnf install -y ${packages[@]} >> ${logfile} 2>&1
+        echo_Done
+    else
+        echo_Skipped
     fi
 }
 
