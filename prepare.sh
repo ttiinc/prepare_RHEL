@@ -154,7 +154,7 @@ GoogleChrome_query () {
 }
 
 GoogleChrome_install () {
-    echo -n -e "Installing Repository: google-chrome\n"
+    echo -n -e "Installing Repository: google-chrome\r"
     if [[ "${InstallGoogleChrome}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
@@ -169,7 +169,7 @@ VirtualBox_query () {
 }
 
 VirtualBox_install () {
-    echo -n -e "Installing Repository: VirtualBox\n"
+    echo -n -e "Installing Repository: VirtualBox\r"
     if [[ "${InstallVirtualBox}" = "yes" ]]; then
         cp ${cdir}/etc/yum.repos.d/virtualbox.repo /etc/yum.repos.d
         dnf install -y VirtualBox-6.0 >> ${logfile} 2>&1
@@ -184,7 +184,7 @@ SELinux_query () {
 }
 
 SELinux_disable () {
-    echo -n -e "Disabling SELinux.\n"
+    echo -n -e "Disabling SELinux.\r"
     if [[ "${DisableSELinux}" = "yes" ]]; then
         sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
         echo_Done
