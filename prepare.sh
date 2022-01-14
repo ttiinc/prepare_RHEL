@@ -50,7 +50,21 @@ echo_title() {
 	echo
 }
 
-antwoord () {
+echo_right() {
+    text=${1}
+    echo
+    tput cuu1
+    tput cuf "${width}"
+    tput cub ${#text}
+    echo "${text}"
+}
+
+echo_success() {
+    tput setaf 2 0 0
+    echo_right "[ OK ]"
+    tput sgr0
+}
+antwoord() {
     read -p "${1}" antwoord
         if [[ ${antwoord} == [yY] || ${antwoord} == [yY][Ee][Ss] ]]; then
             echo "yes"
@@ -59,7 +73,7 @@ antwoord () {
         fi
 }
 
-display_Notice () {
+display_Notice() {
     clear
     tput setaf 4
     cat ${cdir}/notice.txt
@@ -122,6 +136,7 @@ GoogleChrome_install () {
         echo "Installing Repository: google-chrome"
         cp ${cdir}/etc/yum.repos.d/google-chrome.repo /etc/yum.repos.d
         dnf install -y google-chrome-stable >> ${logfile} 2>&1
+        echo_success
     fi
 }
 
@@ -275,7 +290,7 @@ if [[ "${os}" = "Linux" ]]; then
             SELinux_query
             RHEL8_CodereadyBuilder_query
             RHEL8_DefaultPackages_query
-            echo "Prepare"
+            echo_title "Prepare"
             GoogleChrome_install
             VirtualBox_install
             HostName_set
