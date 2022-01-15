@@ -28,6 +28,7 @@ NORMAL=$(tput sgr0)
 BLINK=$(tput blink)
 REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
+YN="(Yes|${BRIGHT}No${NORMAL}) >> "
 
 # +----- Functions ---------------------------------------------------------+
 echo_equals() {
@@ -102,10 +103,10 @@ antwoord() {
 
 display_Notice() {
     clear
-    tput setaf 4
+    tput setaf 6
     cat ${cdir}/notice.txt
     tput sgr0
-    proceed="$(antwoord "Do you want to proceed? (Yes|${BRIGHT}No${NORMAL}) >> ")"
+    proceed="$(antwoord "Do you want to proceed? ${YN}")"
 }
 
 clear_Logfile() {
@@ -146,7 +147,7 @@ LogfileLocation() {
 }
 
 HostName_query() {
-    SetHostname="$(antwoord "Do you want to set hostname? (Yes|No) >> ")"
+    SetHostname="$(antwoord "Do you want to set hostname? ${YN}")"
     if [[ "${SetHostname}" = "yes" ]]; then
         read -p "Hostname: " gethostname
     fi
@@ -163,7 +164,7 @@ HostName_set() {
 }
 
 GoogleChrome_query() {
-    InstallGoogleChrome="$(antwoord "Do you want to get Google Chrome installed? (Yes|No) >> ")"
+    InstallGoogleChrome="$(antwoord "Do you want to get Google Chrome installed? ${YN}")"
 }
 
 GoogleChrome_install() {
@@ -178,7 +179,7 @@ GoogleChrome_install() {
 }
 
 VirtualBox_query() {
-    InstallVirtualBox="$(antwoord "Do you want to get VirtualBox installed? (Yes|No) >> ")"
+    InstallVirtualBox="$(antwoord "Do you want to get VirtualBox installed? ${YN}")"
 }
 
 VirtualBox_install() {
@@ -193,7 +194,7 @@ VirtualBox_install() {
 }
 
 SshRootLogin_query() {
-    DisableSshRoot="$(antwoord "Disable SSH login for root user? (Yes|No) >> ")"
+    DisableSshRoot="$(antwoord "Disable SSH login for root user? "${YN})"
 }
 
 SshRootLogin_disable() {
@@ -219,7 +220,7 @@ SshRootLogin_disable() {
 }
 
 SELinux_query() {
-    DisableSELinux="$(antwoord "Disable SELinux? (Yes|No) >> ")"
+    DisableSELinux="$(antwoord "Disable SELinux? ${YN}")"
 }
 
 SELinux_disable() {
@@ -233,7 +234,7 @@ SELinux_disable() {
 }
 
 SDDM_query() {
-    EnableSDDM="$(antwoord "Enable Simple Desktop Display Manager? (Yes|No) >> ")"
+    EnableSDDM="$(antwoord "Enable Simple Desktop Display Manager? ${YN}")"
 }
 
 SDDM_enable() {
@@ -250,7 +251,7 @@ SDDM_enable() {
 }
 
 SUDO_Timeout_query() {
-    SetSudoTimeout="$(antwoord "Set SUDO Password Timeout? (Yes|No) >> ")"
+    SetSudoTimeout="$(antwoord "Set SUDO Password Timeout? ${YN}")"
     if [[ "${SetSudoTimeout}" = "yes" ]]; then
         read -p "SUDO Password Timeout: " getsudotimeout
     fi
@@ -278,7 +279,7 @@ SUDO_Timeout_set() {
 }
 
 FilesXorg_query() {
-    FilesXorg="$(antwoord "Copy Xorg related files? (Yes|No) >> ")"
+    FilesXorg="$(antwoord "Copy Xorg related files? ${YN}")"
 }
 
 FilesXorg_copy() {
@@ -292,7 +293,7 @@ FilesXorg_copy() {
 }
 
 RHEL8_CodereadyBuilder_query() {
-    EnableCodeReady="$(antwoord "Enable CodeReady Linux Builder? (Yes|No) >> ")"
+    EnableCodeReady="$(antwoord "Enable CodeReady Linux Builder? ${YN}")"
 }
 
 RHEL8_CodereadyBuilder_enable() {
@@ -306,7 +307,7 @@ RHEL8_CodereadyBuilder_enable() {
 }
 
 RHEL8_DefaultPackages_query() {
-    InstallDefaultPackages="$(antwoord "Install default packages? (Yes|No) >> ")"
+    InstallDefaultPackages="$(antwoord "Install default packages? ${YN}")"
 }
 
 RHEL8_DefaultPackages_install() {
