@@ -199,8 +199,13 @@ SshRootLogin_query() {
 SshRootLogin_disable() {
     echo -n -e "Disabling SSH login for root user.\r"
     if [[ "${DisableSshRoot}" = "yes" ]]; then
-        sed -i s/^PermitRootLogin yes/PermitRootLogin no/ /etc/ssh/sshd_config
-        echo_Done
+        sed -i s/PermitRootLogin\ yes/PermitRootLogin\ no/ /etc/ssh/sshd_config >>${logfile} 2>&1
+        retVal=$?
+        if [[ "${retVal}" -ne 0 ]]; then
+            echo_Failed
+        else
+            echo_Done
+        fi
     else
         echo_Skipped
     fi
