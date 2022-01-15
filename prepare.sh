@@ -31,25 +31,25 @@ UNDERLINE=$(tput smul)
 
 # +----- Functions ---------------------------------------------------------+
 echo_equals() {
-	counter=0
-	while [  $counter -lt "$1" ]; do
-		printf '='
-		(( counter=counter+1 ))
-	done
+    counter=0
+    while [  $counter -lt "$1" ]; do
+    printf '='
+    (( counter=counter+1 ))
+    done
 }
 
 echo_title() {
-	title=$1
-	ncols=$(tput cols)
-	nequals=$(((width-${#title})/2-1))
-	tput setaf 4 0 0
-	echo_equals "$nequals"
-	tput setaf 6 0 0
-	printf " %s " "$title"
-	tput setaf 4 0 0
-	echo_equals "$nequals"
-	tput sgr0
-	echo
+    title=$1
+    ncols=$(tput cols)
+    nequals=$(((width-${#title})/2-1))
+    tput setaf 4 0 0
+    echo_equals "$nequals"
+    tput setaf 6 0 0
+    printf " %s " "$title"
+    tput setaf 4 0 0
+    echo_equals "$nequals"
+    tput sgr0
+    echo
 }
 
 echo_Right() {
@@ -105,7 +105,7 @@ display_Notice() {
     tput setaf 4
     cat ${cdir}/notice.txt
     tput sgr0
-    proceed="$(antwoord "Do you want to proceed? (Yes|No) >> ")"
+    proceed="$(antwoord "Do you want to proceed? (Yes|${BRIGHT}No${NORMAL}) >> ")"
 }
 
 clear_Logfile() {
