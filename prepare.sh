@@ -199,12 +199,19 @@ SshRootLogin_query() {
 SshRootLogin_disable() {
     echo -n -e "Disabling SSH login for root user.\r"
     if [[ "${DisableSshRoot}" = "yes" ]]; then
-        sed -i s/PermitRootLogin\ yes/PermitRootLogin\ no/ /etc/ssh/sshd_config >>${logfile} 2>&1
+        grep "^PermitRootLogin" /etc/ssh/sshd_config > /dev/null 2>&1
         retVal=$?
         if [[ "${retVal}" -ne 0 ]]; then
-            echo_Failed
-        else
+            echo -e "\nPermitRootLogin no" >> /etc/ssh/sshd_config
             echo_Done
+        else
+            sed -i "s/^PermitRootLogin\ yes/PermitRootLogin\ no/" /etc/ssh/sshd_config >>${logfile} 2>&1
+            retVal=$?
+            if [[ "${retVal}" -ne 0 ]]; then
+                echo_Failed
+            else
+                echo_Done
+            fi
         fi
     else
         echo_Skipped
@@ -252,8 +259,19 @@ SUDO_Timeout_query() {
 SUDO_Timeout_set() {
     echo -n -e "Setting SUDO Timeout to: ${getsudotimeout}\r"
     if [[ "${SetSudoTimeout}" = "yes" ]]; then
-        echo -e "\nDefaults timestamp_timeout=${getsudotimeout}" >> /etc/sudoers
-        echo_Done
+        grep "^Defaults timestamp_timeout=" /etc/sudoers > /dev/null 2>&1
+        retVal=$?
+        if [[ "${retVal}" -ne 0 ]]; then
+            echo -e "\nDefaults timestamp_timeout=${getsudotimeout}" >> /etc/sudoers
+        else
+            sed -i "s/^Defaults\ timestamp_timeout=.*$/Defaults\ timestamp_timeout=${getsudotimeout}/" /etc/sudoers
+            retVal=$?
+            if [[ "${retVal}" -ne 0 ]]; then
+                echo_Failed
+            else
+                echo_Done
+            fi
+        fi
     else
         echo_Skipped
     fi
