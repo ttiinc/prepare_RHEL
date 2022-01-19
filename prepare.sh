@@ -233,6 +233,33 @@ SELinux_disable() {
     fi
 }
 
+Firewalld_query() {
+    DisableFirewalld="$(antwoord "Disable Firewall? ${YN}")"
+}
+
+Firewalld_disable() {
+    echo -n -e "Disabling Firewall.\r"
+    if [[ "${DisableFirewalld}" = "yes" ]]; then
+        systemctl disable firewalld
+        echo_Done
+    else
+        echo_Skipped
+    fi
+}
+
+do_Restart_query() {
+    Restart="$(antwoord "Don't forget to reboot the system. Reboot now? ${YN}")"
+}
+
+do_Restart() {
+    echo -n -e "Rebooting in 1 minute.\r"
+    if [[ "${Restart}" = "yes" ]]; then
+        reboot
+    else
+        echo_Skipped
+    fi
+}
+
 SDDM_query() {
     EnableSDDM="$(antwoord "Enable Simple Desktop Display Manager? ${YN}")"
 }
@@ -380,6 +407,7 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_query
             HostName_query
             SELinux_query
+            Firewalld_query
             SUDO_Timeout_query
             SshRootLogin_query
             RHEL8_CodereadyBuilder_query
@@ -391,6 +419,7 @@ if [[ "${os}" = "Linux" ]]; then
             VirtualBox_install
             HostName_set
             SELinux_disable
+            Firewalld_disable
             SshRootLogin_disable
             SUDO_Timeout_set
             RHEL8_CodereadyBuilder_enable
@@ -471,4 +500,6 @@ fi
 
 echo_title "I'm done."
 echo -e "\n\n"
+do_Restart_query
+do_Restart
 exit 0
