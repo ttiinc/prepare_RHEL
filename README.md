@@ -10,6 +10,7 @@
 ## Motivation
 To have a post-install script that automates common setup and configuration 
 tasks. This project does not lay down any infrastructure, and expects you to
+
 have the required machines provisioned prior to beginning.
 
 The goals of this project are to:
