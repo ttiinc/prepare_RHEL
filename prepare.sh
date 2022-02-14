@@ -178,6 +178,21 @@ GoogleChrome_install() {
     fi
 }
 
+bind-utils_query() {
+	 InstallBindUtils="$(antwoord "Do you want to get bind-utils installed? ${YN}")"
+}
+
+bind-utils_install() {
+	 echo -n -e "Installing bind-utils\r"
+	 if [[ "${InstallBindUtils}" = "yes" ]]; then
+		  cp ${cdir}/etc/yum.repos.d/bind-utils.repo /etc/yum.repos.d
+		  dnf install -y bind-utils >> ${logfile} 2>&1
+		  echo_Done
+	 else
+		  echo_Skipped
+	 fi
+}
+
 VirtualBox_query() {
     InstallVirtualBox="$(antwoord "Do you want to get VirtualBox installed? ${YN}")"
 }
